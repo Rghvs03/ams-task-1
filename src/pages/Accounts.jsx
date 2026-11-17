@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
+import { selectCurrentUser } from '../redux/authSlice';
 import AccountsTable from '../components/accounts/AccountsTable';
 import AccountModal from '../components/accounts/AccountModal';
 import { Pencil } from 'lucide-react';
@@ -7,6 +9,9 @@ export default function Accounts() {
   const [activeTab, setActiveTab] = useState('list'); // 'list' or 'create'
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [accountToEdit, setAccountToEdit] = useState(null);
+
+  const currentUser = useSelector(selectCurrentUser);
+  const isAdmin = !currentUser || currentUser.role === 'admin';
 
   // Triggered when user clicks "+ Create" or wants to add a new account
   const handleAddNew = () => {
@@ -35,7 +40,9 @@ export default function Accounts() {
         <button
           type="button"
           onClick={() => setActiveTab('list')}
-          className={`px-4 py-1.5 text-xs font-semibold rounded-l border transition-colors ${
+          className={`px-4 py-1.5 text-xs font-semibold border transition-colors ${
+            isAdmin ? 'rounded-l' : 'rounded'
+          } ${
             activeTab === 'list'
               ? 'bg-gray-800 text-white border-gray-800'
               : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
@@ -43,18 +50,20 @@ export default function Accounts() {
         >
           Account
         </button>
-        <button
-          type="button"
-          onClick={handleAddNew}
-          className={`flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold rounded-r border-t border-b border-r transition-colors ${
-            activeTab === 'create'
-              ? 'bg-blue-600 text-white border-blue-600'
-              : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
-          }`}
-        >
-          <Pencil size={12} />
-          <span>Create</span>
-        </button>
+        {isAdmin && (
+          <button
+            type="button"
+            onClick={handleAddNew}
+            className={`flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold rounded-r border-t border-b border-r transition-colors ${
+              activeTab === 'create'
+                ? 'bg-blue-600 text-white border-blue-600'
+                : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
+            }`}
+          >
+            <Pencil size={12} />
+            <span>Create</span>
+          </button>
+        )}
       </div>
 
       {/* Main Account Lists White Card */}

@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { addAccount, updateAccount } from '../../redux/accountSlice';
+import { selectCurrentUser } from '../../redux/authSlice';
 import toast from 'react-hot-toast';
-import { X } from 'lucide-react';
+import { X, Lock } from 'lucide-react';
 
 const INDUSTRIES = [
   'Information Technology',
@@ -22,6 +23,8 @@ const SALES_EXECUTIVES = ['Sales Executive 1', 'Sales Executive 2'];
 
 export default function AccountModal({ isOpen, onClose, accountToEdit }) {
   const dispatch = useDispatch();
+  const currentUser = useSelector(selectCurrentUser);
+  const isAdmin = !currentUser || currentUser.role === 'admin';
   const isEditing = Boolean(accountToEdit);
 
   const {
@@ -273,12 +276,24 @@ export default function AccountModal({ isOpen, onClose, accountToEdit }) {
 
           {/* Row 4: Assigned To (Sales Executive) */}
           <div>
-            <label htmlFor="assignedTo" className="block text-xs font-semibold text-gray-700 mb-1">
-              Assigned To (Sales Executive) <span className="text-red-500">*</span>
-            </label>
+            <div className="flex items-center justify-between mb-1">
+              <label htmlFor="assignedTo" className="block text-xs font-semibold text-gray-700">
+                Assigned To (Sales Executive) <span className="text-red-500">*</span>
+              </label>
+              {!isAdmin && (
+                <span className="inline-flex items-center gap-1 text-[10px] text-gray-400">
+                  <Lock size={10} /> Locked (Admin managed)
+                </span>
+              )}
+            </div>
             <select
               id="assignedTo"
-              className="w-full px-3 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors bg-white cursor-pointer"
+              disabled={!isAdmin}
+              className={`w-full px-3 py-2 text-xs border rounded-lg focus:outline-none transition-colors ${
+                !isAdmin
+                  ? 'bg-gray-100 text-gray-500 border-gray-200 cursor-not-allowed'
+                  : 'bg-white border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 cursor-pointer'
+              }`}
               {...register('assignedTo', { required: 'Please select a sales executive' })}
             >
               {SALES_EXECUTIVES.map((exec) => (

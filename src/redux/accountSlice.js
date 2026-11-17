@@ -67,4 +67,16 @@ export const { addAccount, updateAccount, deleteAccount, resetAccounts } = accou
 // Selectors for easy state consumption
 export const selectAllAccounts = (state) => state.accounts.list;
 
+// Scopes accounts based on active user role:
+// - Admin sees all accounts
+// - Sales Executives only see accounts assigned to them
+export const selectScopedAccounts = (state) => {
+  const user = state.auth?.currentUser;
+  const list = state.accounts.list;
+  if (!user || user.role === 'admin') {
+    return list;
+  }
+  return list.filter((acc) => acc.assignedTo === user.label);
+};
+
 export default accountsSlice.reducer;

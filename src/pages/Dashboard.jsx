@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { selectAllAccounts } from '../redux/accountSlice';
+import { selectScopedAccounts } from '../redux/accountSlice';
+import { selectCurrentUser } from '../redux/authSlice';
 import {
   Building2,
   CircleCheck,
@@ -11,7 +12,9 @@ import {
 } from 'lucide-react';
 
 export default function Dashboard() {
-  const accounts = useSelector(selectAllAccounts);
+  const accounts = useSelector(selectScopedAccounts);
+  const currentUser = useSelector(selectCurrentUser);
+  const isAdmin = !currentUser || currentUser.role === 'admin';
 
   // Compute live KPI metrics dynamically from Redux store
   const totalAccounts = accounts.length;
@@ -54,7 +57,7 @@ export default function Dashboard() {
       value: totalAccounts,
       icon: Building2,
       bgColor: 'bg-blue-600',
-      subtitle: 'All records',
+      subtitle: isAdmin ? 'All records' : `${currentUser?.label || 'Assigned'} portfolio`,
     },
     {
       label: 'Active',

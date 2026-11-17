@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { selectAllAccounts, deleteAccount } from '../../redux/accountSlice';
+import { selectScopedAccounts, deleteAccount } from '../../redux/accountSlice';
+import { selectCurrentUser } from '../../redux/authSlice';
 import * as XLSX from 'xlsx';
 import toast from 'react-hot-toast';
 import {
@@ -34,7 +35,14 @@ const TABLE_COLUMNS = [
 
 export default function AccountsTable({ onEditAccount }) {
   const dispatch = useDispatch();
-  const accounts = useSelector(selectAllAccounts);
+  const accounts = useSelector(selectScopedAccounts);
+  const currentUser = useSelector(selectCurrentUser);
+  const isAdmin = !currentUser || currentUser.role === 'admin';
+
+  // Visible columns based on role: Hide "Assigned To" for Sales Executives to avoid redundancy
+  const visibleColumns = useMemo(() => {
+    return isAdmin ? TABLE_COLUMNS : TABLE_COLUMNS.filter((col) => col.key !== 'assignedTo');
+  }, [isAdmin]);
 
   // Search & Filtering State
   const [searchTerm, setSearchTerm] = useState('');
@@ -241,12 +249,27 @@ export default function AccountsTable({ onEditAccount }) {
         </div>
       )}
 
+      {/* Role-Scoped Portfolio Banner for Sales Executives */}
+      {!isAdmin && (
+        <div className="px-4 py-2 bg-slate-50 border-b border-gray-200 flex items-center justify-between text-xs text-gray-700">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
+            <span>
+              Logged in as <strong className="text-gray-900">{currentUser?.name || currentUser?.label}</strong> — Showing <strong>{accounts.length}</strong> assigned accounts
+            </span>
+          </div>
+          <span className="text-[11px] text-gray-500 font-medium bg-white px-2.5 py-0.5 rounded border border-gray-200 shadow-2xs">
+            Role: {currentUser?.label}
+          </span>
+        </div>
+      )}
+
       {/* Table Container */}
       <div className="overflow-x-auto scroll-smooth">
-        <table className="min-w-[1470px] w-full divide-y divide-gray-100" role="grid" aria-label="Accounts table">
+        <table className={`${isAdmin ? 'min-w-[1470px]' : 'min-w-[1300px]'} w-full divide-y divide-gray-100`} role="grid" aria-label="Accounts table">
           <thead className="bg-gray-50 border-b border-gray-100">
             <tr>
-              {TABLE_COLUMNS.map((col) => {
+              {visibleColumns.map((col) => {
                 const isActiveSort = sortField === col.key;
                 return (
                   <th
@@ -288,7 +311,7 @@ export default function AccountsTable({ onEditAccount }) {
           <tbody className="divide-y divide-gray-100 bg-white">
             {paginatedAccounts.length === 0 ? (
               <tr>
-                <td colSpan={TABLE_COLUMNS.length + 1} className="py-12 text-center">
+                <td colSpan={visibleColumns.length + 1} className="py-12 text-center">
                   <div className="flex flex-col items-center justify-center text-gray-400">
                     <SearchX size={36} className="mb-2 text-gray-300" />
                     <p className="text-sm font-semibold text-gray-700">No accounts found</p>
@@ -355,17 +378,19 @@ export default function AccountsTable({ onEditAccount }) {
                       </span>
                     </td>
 
-                    {/* Assigned To */}
-                    <td className="px-4 py-3 text-xs whitespace-nowrap min-w-[170px]">
-                      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-700 border border-slate-200">
-                        <span
-                          className={`w-1.5 h-1.5 rounded-full ${
-                            account.assignedTo?.includes('1') ? 'bg-blue-500' : 'bg-purple-500'
-                          }`}
-                        />
-                        {account.assignedTo || 'Unassigned'}
-                      </span>
-                    </td>
+                    {/* Assigned To (Rendered only for Admin to prevent redundancy) */}
+                    {isAdmin && (
+                      <td className="px-4 py-3 text-xs whitespace-nowrap min-w-[170px]">
+                        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-700 border border-slate-200">
+                          <span
+                            className={`w-1.5 h-1.5 rounded-full ${
+                              account.assignedTo?.includes('1') ? 'bg-blue-500' : 'bg-purple-500'
+                            }`}
+                          />
+                          {account.assignedTo || 'Unassigned'}
+                        </span>
+                      </td>
+                    )}
 
                     {/* Remark */}
                     <td className="px-4 py-3 text-xs text-gray-500 min-w-[190px] max-w-[240px]">
@@ -409,19 +434,21 @@ export default function AccountsTable({ onEditAccount }) {
                                 className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors text-left"
                               >
                                 <Pencil size={15} className="text-gray-500" />
-                                <span>Edit</span>
+                                <span>{isAdmin ? 'Edit' : 'View / Edit'}</span>
                               </button>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setActiveDropdownRowId(null);
-                                  setAccountToDelete(account);
-                                }}
-                                className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-red-600 hover:bg-red-50 transition-colors text-left"
-                              >
-                                <Trash2 size={15} className="text-red-500" />
-                                <span>Delete</span>
-                              </button>
+                              {isAdmin && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setActiveDropdownRowId(null);
+                                    setAccountToDelete(account);
+                                  }}
+                                  className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-red-600 hover:bg-red-50 transition-colors text-left"
+                                >
+                                  <Trash2 size={15} className="text-red-500" />
+                                  <span>Delete</span>
+                                </button>
+                              )}
                             </div>
                           </>
                         )}
