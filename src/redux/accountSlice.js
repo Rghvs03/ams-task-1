@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { initialAccounts } from './mockData';
 
-const STORAGE_KEY = 'actify_accounts';
+const STORAGE_KEY = 'actify_accounts_v2';
 
 // Helper to safely load data from LocalStorage or fallback to mockData
 const loadFromStorage = () => {
@@ -12,7 +12,12 @@ const loadFromStorage = () => {
       return initialAccounts;
     }
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) && parsed.length > 0 ? parsed : initialAccounts;
+    // Auto-migrate: If stored data is empty or lacks assignedTo mapping, re-seed with latest mock data
+    if (!Array.isArray(parsed) || parsed.length === 0 || !parsed[0]?.assignedTo) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(initialAccounts));
+      return initialAccounts;
+    }
+    return parsed;
   } catch (error) {
     console.error('Failed to load from LocalStorage:', error);
     return initialAccounts;

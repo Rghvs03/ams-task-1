@@ -18,6 +18,8 @@ const INDUSTRIES = [
   'Hospitality',
 ];
 
+const SALES_EXECUTIVES = ['Sales Executive 1', 'Sales Executive 2'];
+
 export default function AccountModal({ isOpen, onClose, accountToEdit }) {
   const dispatch = useDispatch();
   const isEditing = Boolean(accountToEdit);
@@ -36,6 +38,7 @@ export default function AccountModal({ isOpen, onClose, accountToEdit }) {
       website: '',
       industry: '',
       status: 'Active',
+      assignedTo: 'Sales Executive 1',
       remark: '',
     },
   });
@@ -50,6 +53,7 @@ export default function AccountModal({ isOpen, onClose, accountToEdit }) {
         website: accountToEdit.website || '',
         industry: accountToEdit.industry || '',
         status: accountToEdit.status || 'Active',
+        assignedTo: accountToEdit.assignedTo || 'Sales Executive 1',
         remark: accountToEdit.remark || '',
       });
     } else {
@@ -60,6 +64,7 @@ export default function AccountModal({ isOpen, onClose, accountToEdit }) {
         website: '',
         industry: '',
         status: 'Active',
+        assignedTo: 'Sales Executive 1',
         remark: '',
       });
     }
@@ -81,6 +86,7 @@ export default function AccountModal({ isOpen, onClose, accountToEdit }) {
       website: formattedWebsite,
       industry: formData.industry,
       status: formData.status,
+      assignedTo: formData.assignedTo || 'Sales Executive 1',
       remark: formData.remark?.trim() || '',
     };
 
@@ -265,7 +271,25 @@ export default function AccountModal({ isOpen, onClose, accountToEdit }) {
             </div>
           </div>
 
-          {/* Row 4: Remark */}
+          {/* Row 4: Assigned To (Sales Executive) */}
+          <div>
+            <label htmlFor="assignedTo" className="block text-xs font-semibold text-gray-700 mb-1">
+              Assigned To (Sales Executive) <span className="text-red-500">*</span>
+            </label>
+            <select
+              id="assignedTo"
+              className="w-full px-3 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors bg-white cursor-pointer"
+              {...register('assignedTo', { required: 'Please select a sales executive' })}
+            >
+              {SALES_EXECUTIVES.map((exec) => (
+                <option key={exec} value={exec}>
+                  {exec}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Row 5: Remark */}
           <div>
             <label htmlFor="remark" className="block text-xs font-semibold text-gray-700 mb-1">
               Remark

@@ -28,6 +28,7 @@ const TABLE_COLUMNS = [
   { key: 'website', label: 'Website', sortable: true, width: 'min-w-[190px]' },
   { key: 'industry', label: 'Industry', sortable: true, width: 'min-w-[165px]' },
   { key: 'status', label: 'Account Status', sortable: true, width: 'min-w-[130px]' },
+  { key: 'assignedTo', label: 'Assigned To', sortable: true, width: 'min-w-[170px]' },
   { key: 'remark', label: 'Remark', sortable: false, width: 'min-w-[190px]' },
 ];
 
@@ -65,6 +66,7 @@ export default function AccountsTable({ onEditAccount }) {
         acc.website,
         acc.industry,
         acc.status,
+        acc.assignedTo,
         acc.remark,
       ];
       return matchFields.some((field) =>
@@ -130,6 +132,7 @@ export default function AccountsTable({ onEditAccount }) {
         Website: acc.website || '',
         Industry: acc.industry,
         'Account Status': acc.status,
+        'Assigned To': acc.assignedTo || '',
         Remark: acc.remark || '',
       }));
 
@@ -240,7 +243,7 @@ export default function AccountsTable({ onEditAccount }) {
 
       {/* Table Container */}
       <div className="overflow-x-auto scroll-smooth">
-        <table className="min-w-[1300px] w-full divide-y divide-gray-100" role="grid" aria-label="Accounts table">
+        <table className="min-w-[1470px] w-full divide-y divide-gray-100" role="grid" aria-label="Accounts table">
           <thead className="bg-gray-50 border-b border-gray-100">
             <tr>
               {TABLE_COLUMNS.map((col) => {
@@ -349,6 +352,18 @@ export default function AccountsTable({ onEditAccount }) {
                         }
                       >
                         {account.status === 'Active' ? 'true' : 'false'}
+                      </span>
+                    </td>
+
+                    {/* Assigned To */}
+                    <td className="px-4 py-3 text-xs whitespace-nowrap min-w-[170px]">
+                      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-700 border border-slate-200">
+                        <span
+                          className={`w-1.5 h-1.5 rounded-full ${
+                            account.assignedTo?.includes('1') ? 'bg-blue-500' : 'bg-purple-500'
+                          }`}
+                        />
+                        {account.assignedTo || 'Unassigned'}
                       </span>
                     </td>
 
