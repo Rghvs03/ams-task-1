@@ -92,10 +92,8 @@ export default function Header({ onMenuClick }) {
           >
             <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold select-none shadow-xs ${
               currentUser?.role === 'admin' 
-                ? 'bg-gradient-to-br from-slate-700 to-slate-900' 
-                : currentUser?.label?.includes('1')
-                ? 'bg-gradient-to-br from-blue-600 to-blue-800'
-                : 'bg-gradient-to-br from-purple-600 to-purple-800'
+                ? 'bg-slate-800' 
+                : 'bg-blue-600'
             }`}>
               {initials}
             </div>

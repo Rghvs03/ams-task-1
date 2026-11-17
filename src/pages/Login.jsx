@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { login, selectCurrentUser, SYSTEM_USERS } from '../redux/authSlice';
@@ -16,14 +16,6 @@ export default function Login() {
   // If sales_exec, which executive: 'usr-se1' or 'usr-se2'
   const [selectedExecutiveId, setSelectedExecutiveId] = useState('usr-se1');
 
-  // Demo Password state
-  const [password, setPassword] = useState('password123');
-
-  // If already logged in, redirect to Dashboard
-  if (currentUser) {
-    return <Navigate to="/" replace />;
-  }
-
   const adminUser = SYSTEM_USERS.find((u) => u.role === 'admin');
   const se1User = SYSTEM_USERS.find((u) => u.id === 'usr-se1');
   const se2User = SYSTEM_USERS.find((u) => u.id === 'usr-se2');
@@ -35,9 +27,30 @@ export default function Login() {
       ? se1User
       : se2User;
 
+  // Demo Password state initialized with active user's unique password
+  const [password, setPassword] = useState(activeUser?.password || 'admin@123');
+
+  // Automatically update the password state when switching roles/users
+  useEffect(() => {
+    if (activeUser?.password) {
+      setPassword(activeUser.password);
+    }
+  }, [activeUser]);
+
+  // If already logged in, redirect to Dashboard
+  if (currentUser) {
+    return <Navigate to="/" replace />;
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!activeUser) return;
+
+    // Strict validation against the specific user's password
+    if (password !== activeUser.password) {
+      toast.error(`Invalid password for ${activeUser.label}! Expected: ${activeUser.password}`);
+      return;
+    }
 
     dispatch(login(activeUser));
     toast.success(`Welcome back, ${activeUser.name}!`);
@@ -45,18 +58,49 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col justify-center items-center p-4">
-      <Toaster position="top-right" toastOptions={{ duration: 3500 }} />
+    <div className="min-h-screen bg-gray-200 flex flex-col justify-center items-center p-4">
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          duration: 3500,
+          style: {
+            fontFamily: 'Inter, system-ui, sans-serif',
+            fontSize: '12.5px',
+            fontWeight: '500',
+            color: '#1e293b',
+            background: '#ffffff',
+            border: '1px solid #bfdbfe',
+            boxShadow: '0 10px 25px -5px rgba(37, 99, 235, 0.12), 0 8px 10px -6px rgba(37, 99, 235, 0.08)',
+            borderRadius: '10px',
+            padding: '10px 16px',
+          },
+          success: {
+            iconTheme: {
+              primary: '#2563eb',
+              secondary: '#ffffff',
+            },
+            style: {
+              border: '1px solid #93c5fd',
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: '#ef4444',
+              secondary: '#ffffff',
+            },
+            style: {
+              border: '1px solid #fca5a5',
+            },
+          },
+        }}
+      />
       <div className="w-full max-w-md">
         {/* Brand Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-amber-400 text-slate-900 font-bold mb-3 shadow-lg shadow-amber-400/20">
-            <Zap size={26} className="fill-current" />
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-blue-500 text-slate-900 font-bold mb-3 shadow-lg shadow-amber-400/20">
+            <Zap size={26} className='text-white' />
           </div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">Actify Business</h1>
-          <p className="text-xs text-slate-400 mt-1">
-            Account Management System (AMS) • Role-Based Access
-          </p>
+          <h1 className="text-2xl font-bold text-primary-500 tracking-tight">Actify Business</h1>
         </div>
 
         {/* Card */}
@@ -84,7 +128,7 @@ export default function Login() {
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              <Briefcase size={14} className={activeRoleTab === 'sales_exec' ? 'text-purple-600' : 'text-slate-400'} />
+              <Briefcase size={14} className={activeRoleTab === 'sales_exec' ? 'text-blue-600' : 'text-slate-400'} />
               <span>Sales Executive</span>
             </button>
           </div>
@@ -102,7 +146,7 @@ export default function Login() {
                     onClick={() => setSelectedExecutiveId('usr-se1')}
                     className={`p-2.5 rounded-lg border text-left transition-all ${
                       selectedExecutiveId === 'usr-se1'
-                        ? 'border-purple-600 bg-purple-50/50 ring-1 ring-purple-600'
+                        ? 'border-blue-600 bg-blue-50/60 ring-1 ring-blue-600'
                         : 'border-gray-200 hover:border-gray-300 bg-white'
                     }`}
                   >
@@ -114,7 +158,7 @@ export default function Login() {
                     onClick={() => setSelectedExecutiveId('usr-se2')}
                     className={`p-2.5 rounded-lg border text-left transition-all ${
                       selectedExecutiveId === 'usr-se2'
-                        ? 'border-purple-600 bg-purple-50/50 ring-1 ring-purple-600'
+                        ? 'border-blue-600 bg-blue-50/60 ring-1 ring-blue-600'
                         : 'border-gray-200 hover:border-gray-300 bg-white'
                     }`}
                   >
@@ -163,17 +207,12 @@ export default function Login() {
               </div>
             </div>
 
-            {/* Role Permissions Hint */}
-            <div className="p-3 rounded-lg bg-slate-50 border border-slate-200/80 text-[11px] text-slate-600">
-              {activeRoleTab === 'admin' ? (
-                <p>
-                  👑 <strong>Admin Access:</strong> Full visibility of all 99 accounts, account-executive mapping, and system reports.
-                </p>
-              ) : (
-                <p>
-                  💼 <strong>Sales Executive Access:</strong> Scoped access strictly to accounts and contacts mapped to your portfolio.
-                </p>
-              )}
+            {/* Demo Password Helper Pill */}
+            <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-blue-50/70 border border-blue-100 text-[11px] text-blue-800">
+              <span className="font-medium">
+                Password for {activeUser?.label}: <code className="bg-white px-1.5 py-0.5 rounded border border-blue-200 text-blue-700 font-mono font-semibold">{activeUser?.password}</code>
+              </span>
+              <span className="text-[10px] text-blue-600 font-medium">Pre-filled</span>
             </div>
 
             {/* Submit Button */}
@@ -188,8 +227,8 @@ export default function Login() {
         </div>
 
         {/* Footer info */}
-        <p className="text-center text-[11px] text-slate-500 mt-6">
-          Actify Zone Assessment • Role-Based Row-Level Access Demo
+        <p className="text-center text-[11px] text-gray-600 mt-6">
+          Actify Zone Inc.
         </p>
       </div>
     </div>

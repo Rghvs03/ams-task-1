@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { selectCurrentUser } from '../../redux/authSlice';
 import {
   Zap,
   LayoutDashboard,
@@ -65,6 +67,16 @@ const secondaryLinks = [
 
 export default function Sidebar({ isOpen, onClose }) {
   const location = useLocation();
+  const currentUser = useSelector(selectCurrentUser);
+
+  const initials = currentUser?.name
+    ? currentUser.name
+        .split(' ')
+        .map((n) => n[0])
+        .slice(0, 2)
+        .join('')
+        .toUpperCase()
+    : 'A';
 
   // Helper: check if a group has an active child
   const hasActiveChild = (group) =>
@@ -264,16 +276,16 @@ export default function Sidebar({ isOpen, onClose }) {
 
         {/* Sidebar Footer User Card */}
         <div className="px-3 py-3 border-t border-gray-100 flex-shrink-0">
-          <div className="flex items-center gap-2.5 p-2 rounded-md">
-            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-              A
+          <div className="flex items-center gap-2.5 p-2 rounded-md hover:bg-gray-50 transition-colors">
+            <div className="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0 shadow-xs">
+              {initials}
             </div>
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <p className="text-xs font-semibold text-gray-800 truncate">
-                Actify
+                {currentUser?.name || 'Actify'}
               </p>
               <p className="text-[10px] text-gray-400 truncate">
-                actify@example.io
+                {currentUser?.email || 'actify@example.io'}
               </p>
             </div>
           </div>

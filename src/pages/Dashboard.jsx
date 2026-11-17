@@ -77,7 +77,7 @@ export default function Dashboard() {
       label: 'Industries',
       value: totalIndustriesCount,
       icon: Activity,
-      bgColor: 'bg-violet-500',
+      bgColor: 'bg-blue-500',
       subtitle: 'Sectors covered',
     },
   ];

@@ -2,6 +2,8 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Layout from './components/layout/Layout';
 import Dashboard from './pages/Dashboard';
 import Accounts from './pages/Accounts';
+import Contacts from './pages/Contacts';
+import Leads from './pages/Leads';
 import Login from './pages/Login';
 import Placeholder from './pages/Placeholder';
 
@@ -15,8 +17,8 @@ export default function App() {
           <Route path="accounts" element={<Accounts />} />
           <Route path="account-report" element={<Placeholder title="Account Report" description="Live analytics derived from your account dataset." />} />
           <Route path="account-upload" element={<Placeholder title="Account Upload" description="Import account records from a CSV file. Preview and validate before importing." />} />
-          <Route path="contacts" element={<Placeholder title="Contact" description="Manage individual contacts linked to your accounts." />} />
-          <Route path="leads" element={<Placeholder title="Lead" description="Track and manage incoming leads from your campaigns." />} />
+          <Route path="contacts" element={<Contacts />} />
+          <Route path="leads" element={<Leads />} />
           <Route path="deals" element={<Placeholder title="Deal" description="Monitor your deal pipeline and revenue opportunities." />} />
           <Route path="profile" element={<Placeholder title="Profile" description="Personal, education, experience, and other details." />} />
           <Route path="inbox" element={<Placeholder title="Inbox" description="Your messages and notifications will appear here." />} />

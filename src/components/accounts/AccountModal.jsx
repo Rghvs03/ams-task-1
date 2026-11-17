@@ -89,7 +89,9 @@ export default function AccountModal({ isOpen, onClose, accountToEdit }) {
       website: formattedWebsite,
       industry: formData.industry,
       status: formData.status,
-      assignedTo: formData.assignedTo || 'Sales Executive 1',
+      assignedTo: isEditing
+        ? (isAdmin ? (formData.assignedTo || accountToEdit.assignedTo) : accountToEdit.assignedTo)
+        : (formData.assignedTo || 'Sales Executive 1'),
       remark: formData.remark?.trim() || '',
     };
 

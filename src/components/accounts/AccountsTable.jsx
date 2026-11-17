@@ -249,21 +249,6 @@ export default function AccountsTable({ onEditAccount }) {
         </div>
       )}
 
-      {/* Role-Scoped Portfolio Banner for Sales Executives */}
-      {!isAdmin && (
-        <div className="px-4 py-2 bg-slate-50 border-b border-gray-200 flex items-center justify-between text-xs text-gray-700">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
-            <span>
-              Logged in as <strong className="text-gray-900">{currentUser?.name || currentUser?.label}</strong> — Showing <strong>{accounts.length}</strong> assigned accounts
-            </span>
-          </div>
-          <span className="text-[11px] text-gray-500 font-medium bg-white px-2.5 py-0.5 rounded border border-gray-200 shadow-2xs">
-            Role: {currentUser?.label}
-          </span>
-        </div>
-      )}
-
       {/* Table Container */}
       <div className="overflow-x-auto scroll-smooth">
         <table className={`${isAdmin ? 'min-w-[1470px]' : 'min-w-[1300px]'} w-full divide-y divide-gray-100`} role="grid" aria-label="Accounts table">
@@ -384,7 +369,7 @@ export default function AccountsTable({ onEditAccount }) {
                         <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-700 border border-slate-200">
                           <span
                             className={`w-1.5 h-1.5 rounded-full ${
-                              account.assignedTo?.includes('1') ? 'bg-blue-500' : 'bg-purple-500'
+                              account.assignedTo?.includes('1') ? 'bg-blue-600' : 'bg-sky-500'
                             }`}
                           />
                           {account.assignedTo || 'Unassigned'}

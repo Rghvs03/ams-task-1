@@ -7,6 +7,7 @@ export const SYSTEM_USERS = [
     id: 'usr-admin',
     name: 'Admin User',
     email: 'admin@actifyzone.com',
+    password: 'admin@123',
     role: 'admin',
     label: 'Admin',
   },
@@ -14,6 +15,7 @@ export const SYSTEM_USERS = [
     id: 'usr-se1',
     name: 'Sales Executive 1',
     email: 'se1@actifyzone.com',
+    password: 'se1@123',
     role: 'sales_exec',
     label: 'Sales Executive 1',
   },
@@ -21,6 +23,7 @@ export const SYSTEM_USERS = [
     id: 'usr-se2',
     name: 'Sales Executive 2',
     email: 'se2@actifyzone.com',
+    password: 'se2@123',
     role: 'sales_exec',
     label: 'Sales Executive 2',
   },
@@ -29,12 +32,12 @@ export const SYSTEM_USERS = [
 const loadUserFromStorage = () => {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return SYSTEM_USERS[0]; // Default to Admin
+    if (!raw) return null;
     const parsed = JSON.parse(raw);
     const matched = SYSTEM_USERS.find((u) => u.id === parsed?.id);
-    return matched || SYSTEM_USERS[0];
+    return matched || null;
   } catch {
-    return SYSTEM_USERS[0];
+    return null;
   }
 };
 
