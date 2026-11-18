@@ -14,9 +14,9 @@ const titleMap = {
   '/inbox': 'Inbox',
   '/my-jobs': 'My Jobs',
   '/test-results': 'Test Results',
-  '/contacts': 'Contact',
-  '/leads': 'Lead',
-  '/deals': 'Deal',
+  '/contacts': 'Contacts',
+  '/leads': 'Leads',
+  '/deals': 'Deals',
   '/feedback': 'Feedback',
   '/reports': 'Account Reports',
   '/settings': 'Settings'
